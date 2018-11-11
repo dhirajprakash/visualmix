@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -23,9 +22,9 @@ public class VisualMixService {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
-	VisualMixResponse vm ;
+	VisualMixResponse vm;
 
 	ObjectMapper mapper = new ObjectMapper();
 	Map<String, String> returnString = new HashMap<>();
@@ -33,7 +32,7 @@ public class VisualMixService {
 	private Logger logger = LoggerFactory.getLogger(VisualMixService.class);
 
 	public ResponseEntity<?> incluirAutor(String nome, String cpf) {
-        
+
 		Autor autor = new Autor();
 		autor.setId(vmaxAutor.findMaxId() + 1);
 		autor.setNome(nome);
@@ -41,7 +40,7 @@ public class VisualMixService {
 		vmaxAutor.save(autor);
 		vm.setDescricao("SALVO COM SUCESSO");
 		vm.setLogicJson(autor);
-		
+
 		return new ResponseEntity(vm, HttpStatus.OK);
 	}
 
@@ -52,7 +51,6 @@ public class VisualMixService {
 		vmaxAutor.save(autor);
 		vm.setDescricao("ALTERADO COM SUCESSO");
 		vm.setLogicJson(autor);
-		
 
 		return new ResponseEntity(vm, HttpStatus.OK);
 	}
@@ -77,9 +75,9 @@ public class VisualMixService {
 	}
 
 	public ResponseEntity<?> listarTodosAutor() {
-		
-        vm.setDescricao("Liste todos");
-        vm.setLogicJson(vmaxAutor.findAll());
+
+		vm.setDescricao("Liste todos");
+		vm.setLogicJson(vmaxAutor.findAll());
 		return new ResponseEntity(vm, HttpStatus.OK);
 	}
 
@@ -89,16 +87,16 @@ public class VisualMixService {
 
 		return new ResponseEntity(vm, HttpStatus.OK);
 	}
-	
+
 	public ResponseEntity<?> testjdbc(VisualMixSQLFilterParameters vmp) {
-		
+
 		ArrayList<Relatorios> mp = new ArrayList<Relatorios>();
 		try {
-			if(vmp.getLogicName().equalsIgnoreCase("first"))
-			     mp = runFirstTask(vmp.getVisualMixKeySet());
-			else if(vmp.getLogicName().equalsIgnoreCase("second"))
+			if (vmp.getLogicName().equalsIgnoreCase("first"))
+				mp = runFirstTask(vmp.getVisualMixKeySet());
+			else if (vmp.getLogicName().equalsIgnoreCase("second"))
 				mp = runSecondTask(vmp.getVisualMixKeySet());
-				
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -109,64 +107,66 @@ public class VisualMixService {
 		return new ResponseEntity(vm, HttpStatus.OK);
 	}
 
-	
-
 	public ArrayList<Relatorios> runFirstTask(String... strings) throws Exception {
-		ArrayList<Relatorios> alist=new ArrayList<Relatorios>();
+		ArrayList<Relatorios> alist = new ArrayList<Relatorios>();
 		jdbcTemplate.query("SELECT id, numero_de_os, user FROM relatorios WHERE user = ?", new Object[] { strings[0] },
 				(rs, rowNum) -> new Relatorios(rs.getInt("id"), rs.getString("numero_de_os"), rs.getString("user")))
 				.forEach(relatorios -> {
-					//logger.info(customer.toString()
-			          alist.add(relatorios);
-					
+					// logger.info(customer.toString()
+					alist.add(relatorios);
+
 				});
-		
+
 		return alist;
 	}
-	
+
 	public ArrayList<Relatorios> runSecondTask(String... strings) throws Exception {
-		ArrayList<Relatorios> alist=new ArrayList<Relatorios>();
-		jdbcTemplate.query("SELECT rl.id,rl.numero_de_os as no,rl.user,udos.full_name FROM relatorios2.relatorios as rl \n" + 
-				"LEFT JOIN relatorios2.user_details_os udos on udos.username=rl.user where rl.user = ?", new Object[] { strings[0] },
-				(rs, rowNum) -> new Relatorios(rs.getInt("id"), rs.getString("no"), rs.getString("user"),rs.getString("full_name")))
+		ArrayList<Relatorios> alist = new ArrayList<Relatorios>();
+		jdbcTemplate.query(
+				"SELECT rl.id,rl.numero_de_os as no,rl.user,udos.full_name FROM relatorios2.relatorios as rl \n"
+						+ "LEFT JOIN relatorios2.user_details_os udos on udos.username=rl.user where rl.user = ?",
+				new Object[] { strings[0] }, (rs, rowNum) -> new Relatorios(rs.getInt("id"), rs.getString("no"),
+						rs.getString("user"), rs.getString("full_name")))
 				.forEach(relatorios -> {
-					
-			          alist.add(relatorios);
-					
+
+					alist.add(relatorios);
+
 				});
-		
+
 		return alist;
 	}
-	
+
 	/*
 	 * 
 	 * public void runTasks(String... strings) throws Exception {
-
-        logger.info("Creating tables");
-
-        jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
-        jdbcTemplate.execute("CREATE TABLE customers(" +
-                "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
-
-        // Split up the array of whole names into an array of first/last names
-        List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
-                .map(name -> name.split(" "))
-                .collect(Collectors.toList());
-
-        // Use a Java 8 stream to print out each tuple of the list
-        splitUpNames.forEach(name -> logger.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
-
-        // Uses JdbcTemplate's batchUpdate operation to bulk load data
-        jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
-
-        log.info("Querying for customer records where first_name = 'Josh':");
-        jdbcTemplate.query(
-                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[] { "Josh" },
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
-        ).forEach(customer -> logger.info(customer.toString()));
-    }
+	 * 
+	 * logger.info("Creating tables");
+	 * 
+	 * jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
+	 * jdbcTemplate.execute("CREATE TABLE customers(" +
+	 * "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
+	 * 
+	 * // Split up the array of whole names into an array of first/last names
+	 * List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean",
+	 * "Josh Bloch", "Josh Long").stream() .map(name -> name.split(" "))
+	 * .collect(Collectors.toList());
+	 * 
+	 * // Use a Java 8 stream to print out each tuple of the list
+	 * splitUpNames.forEach(name ->
+	 * logger.info(String.format("Inserting customer record for %s %s", name[0],
+	 * name[1])));
+	 * 
+	 * // Uses JdbcTemplate's batchUpdate operation to bulk load data jdbcTemplate.
+	 * batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)",
+	 * splitUpNames);
+	 * 
+	 * log.info("Querying for customer records where first_name = 'Josh':");
+	 * jdbcTemplate.query(
+	 * "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new
+	 * Object[] { "Josh" }, (rs, rowNum) -> new Customer(rs.getLong("id"),
+	 * rs.getString("first_name"), rs.getString("last_name")) ).forEach(customer ->
+	 * logger.info(customer.toString())); }
 	 * 
 	 */
-	 
 
 }

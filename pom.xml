@@ -4,10 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.dhirajprakash</groupId>
-	<artifactId>visualmix3</artifactId>
+	<artifactId>visualmix</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-
 	<name>CRUD</name>
 	<description>Demo project for Spring Boot</description>
 

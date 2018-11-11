@@ -1,9 +1,6 @@
 package com.dhirajprakash.vm.autor;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +24,7 @@ public class VisualMixController {
 	public ResponseEntity<?> test() {
 
 		return visualMixService.test();
+
 	}
 
 	@PostMapping("/vmax/operation")
